@@ -1,4 +1,4 @@
-name: oker-images
+name: docker-images
 
 on:
   push:
