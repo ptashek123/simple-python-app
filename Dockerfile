@@ -1,24 +1,22 @@
-# ---------- Stage 1: Build ----------
 FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
 COPY pyproject.toml ./
-RUN pip install --upgrade pip
-RUN pip install "psycopg[binary]" .[test]  # Устанавливаются зависимости для тестов, включая pytest
+RUN pip install --upgrade pip && pip install "psycopg[binary]" .[test]
 
 COPY . .
 
-# ---------- Stage 2: Test ----------
 FROM builder AS test
+
 CMD ["pytest", "tests"]
 
-# ---------- Stage 3: Production ----------
 FROM python:3.11-slim
 
 RUN useradd -m appuser
 
 WORKDIR /app
+
 COPY --from=builder /app /app
 
 RUN pip install --no-cache-dir "psycopg[binary]" .
