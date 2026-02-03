@@ -1,20 +1,24 @@
+version: "3.8"
+
 services:
   db:
-    image: postgres:latest
+    image: postgres:15-alpine
     restart: unless-stopped
     environment:
-      # создаём БД kubsu и пользователя kubsu с паролем kubsu
       POSTGRES_DB: kubsu
       POSTGRES_USER: kubsu
       POSTGRES_PASSWORD: kubsu
     ports:
       - "5432:5432"
     volumes:
-      # для постоянного хранения данных
       - db-data:/var/lib/postgresql/data
-      # дамп прокатится единоразово при инициализации
       - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kubsu -d kubsu"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 volumes:
   db-data:
-
